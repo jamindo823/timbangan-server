@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timbangan Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e0f11;
+      --surface: #16181c;
+      --surface2: #1e2026;
+      --border: #2a2d35;
+      --border2: #363a44;
+      --text: #e8eaf0;
+      --muted: #8890a4;
+      --hint: #525869;
+      --green: #22c55e;
+      --green-dim: #16a34a33;
+      --amber: #f59e0b;
+      --amber-dim: #d9770633;
+      --red: #ef4444;
+      --red-dim: #dc262633;
+      --blue: #60a5fa;
+      --blue-dim: #2563eb33;
+      --accent: #6ee7b7;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 18px; height: 18px; fill: #0e0f11; }
+    .app-name { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+    .app-sub  { font-size: 11px; color: var(--muted); }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid;
+      font-size: 12px; font-weight: 500;
+      transition: all 0.3s;
+    }
+    .status-pill.online  { background: var(--green-dim); border-color: #22c55e55; color: var(--green); }
+    .status-pill.offline { background: var(--red-dim);   border-color: #ef444455; color: var(--red); }
+    .status-pill .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor;
+    }
+    .status-pill.online .dot { animation: blink 1.4s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── Layout ── */
+    .main { padding: 20px 24px; max-width: 1100px; margin: 0 auto; }
+
+    /* ── Metric grid ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent-line, var(--border));
+      border-radius: 12px 12px 0 0;
+    }
+    .metric-card.green::before  { --accent-line: var(--green); }
+    .metric-card.amber::before  { --accent-line: var(--amber); }
+    .metric-card.blue::before   { --accent-line: var(--blue); }
+    .metric-card.accent::before { --accent-line: var(--accent); }
+    .metric-label {
+      font-size: 11px; color: var(--muted); font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .metric-label svg { width: 13px; height: 13px; opacity: 0.7; }
+    .metric-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 28px; font-weight: 500;
+      letter-spacing: -1px;
+      color: var(--text);
+      line-height: 1;
+    }
+    .metric-value span { font-size: 14px; color: var(--muted); font-weight: 400; margin-left: 3px; }
+    .metric-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-top: 8px;
+      font-size: 11px; padding: 3px 8px;
+      border-radius: 20px; border: 1px solid;
+    }
+    .badge-green { background: var(--green-dim); border-color: #22c55e44; color: var(--green); }
+    .badge-amber { background: var(--amber-dim); border-color: #f59e0b44; color: var(--amber); }
+    .badge-red   { background: var(--red-dim);   border-color: #ef444444; color: var(--red); }
+    .badge-gray  { background: var(--surface2);  border-color: var(--border); color: var(--muted); }
+
+    /* ── Bottom grid ── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 12px;
+    }
+    @media (max-width: 720px) { .bottom-grid { grid-template-columns: 1fr; } }
+
+    /* ── Section card ── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 13px; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title svg { width: 15px; height: 15px; color: var(--muted); }
+    .section-body { padding: 16px 18px; }
+
+    /* ── Riwayat table ── */
+    .riwayat-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      text-align: left; padding: 8px 10px;
+      color: var(--muted); font-weight: 500;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 10px 10px; color: var(--text); }
+    .mono { font-family: 'DM Mono', monospace; }
+    .td-muted { color: var(--muted); }
+    .empty-row { text-align: center; padding: 24px; color: var(--hint); font-size: 13px; }
+
+    /* ── Status panel ── */
+    .status-list { display: flex; flex-direction: column; gap: 10px; }
+    .status-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .status-key { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .status-key svg { width: 14px; height: 14px; }
+    .status-val { font-size: 13px; font-weight: 500; font-family: 'DM Mono', monospace; }
+    .val-green { color: var(--green); }
+    .val-amber { color: var(--amber); }
+    .val-red   { color: var(--red); }
+    .val-muted { color: var(--muted); }
+
+    /* ── Battery bar ── */
+    .bat-bar-wrap { margin-top: 4px; }
+    .bat-track {
+      height: 4px; border-radius: 2px;
+      background: var(--border2);
+      overflow: hidden;
+    }
+    .bat-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.6s ease, background 0.4s;
+    }
+
+    /* ── Tombol aksi ── */
+    .btn-clear {
+      background: none; border: 1px solid var(--border2);
+      color: var(--muted); font-size: 12px; padding: 5px 12px;
+      border-radius: 6px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+    .btn-clear:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+
+    /* ── Last update ── */
+    .last-update {
+      font-size: 11px; color: var(--hint);
+      text-align: right;
+      padding: 10px 0 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm2 4h14v2H5zm-2 4h18v2H3zm2 4h14v2H5z"/></svg>
+    </div>
+    <div>
+      <div class="app-name">Timbangan Digital</div>
+      <div class="app-sub">ESP32 · Real-time Dashboard</div>
+    </div>
+  </div>
+  <div class="status-pill offline" id="status-pill">
+    <div class="dot"></div>
+    <span id="status-text">Offline</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Metric cards -->
+  <div class="metrics">
+    <div class="metric-card green">
+      <div class="metric-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Berat sekarang
+      </div>
+      <div class="metric-value" id="berat-now">0.00<span>kg</span></div>
+      <div id="lock-badge" class="metric-badge badge-gray" style="margin-top:8px">Menunggu beban</div>
+    </div>
+
+    <div class="metric-card accent">
+      <div class="metric-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Total berat
+      </div>
+      <div class="metric-value" id="total-berat">0.00<span>kg</span></div>
+      <div id="transaksi-badge" class="metric-badge badge-gray" style="margin-top:8px">0 transaksi</div>
+    </div>
+
+    <div class="metric-card amber">
+      <div class="metric-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Harga / kg
+      </div>
+      <div class="metric-value" id="harga-kg">—<span>Rp</span></div>
+      <div id="harga-badge" class="metric-badge badge-gray" style="margin-top:8px">Belum disimpan</div>
+    </div>
+
+    <div class="metric-card blue">
+      <div class="metric-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Total bayar
+      </div>
+      <div class="metric-value" id="total-bayar" style="font-size:22px">Rp 0</div>
+      <div id="bayar-detail" class="metric-badge badge-gray" style="margin-top:8px">—</div>
+    </div>
+  </div>
+
+  <!-- Bottom section -->
+  <div class="bottom-grid">
+
+    <!-- Riwayat -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Riwayat penimbangan
+        </div>
+        <button class="btn-clear" onclick="hapusRiwayat()">Hapus semua</button>
+      </div>
+      <div class="section-body" style="padding:0;">
+        <div class="riwayat-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Berat</th>
+                <th>Harga/kg</th>
+                <th>Subtotal</th>
+                <th>Waktu</th>
+              </tr>
+            </thead>
+            <tbody id="riwayat-tbody">
+              <tr><td class="empty-row" colspan="5">Belum ada transaksi</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status panel -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Status perangkat
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="status-list">
+
+          <div class="status-row">
+            <div class="status-key">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+              WiFi RSSI
+            </div>
+            <span class="status-val" id="s-rssi">—</span>
+          </div>
+
+          <div class="status-row">
+            <div class="status-key">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
+              Baterai
+            </div>
+            <div style="text-align:right">
+              <span class="status-val" id="s-bat-v">—</span>
+              <div class="bat-bar-wrap" style="width:100px; margin-top:4px;">
+                <div class="bat-track"><div class="bat-fill" id="bat-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="status-row">
+            <div class="status-key">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Lock berat
+            </div>
+            <span class="status-val" id="s-lock">—</span>
+          </div>
+
+          <div class="status-row">
+            <div class="status-key">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/></svg>
+              Harga status
+            </div>
+            <span class="status-val" id="s-harga-sv">—</span>
+          </div>
+
+          <div class="status-row">
+            <div class="status-key">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Terakhir update
+            </div>
+            <span class="status-val val-muted" id="s-time">—</span>
+          </div>
+
+        </div>
+        <div class="last-update" id="last-update-text">Menunggu data dari perangkat...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function rupiah(n) {
+    return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+  }
+  function kg(n) { return parseFloat(n).toFixed(2); }
+
+  async function fetchData() {
+    try {
+      const [dataRes, riwayatRes] = await Promise.all([
+        fetch('/api/data'),
+        fetch('/api/riwayat')
+      ]);
+      const d = await dataRes.json();
+      const r = await riwayatRes.json();
+      updateUI(d, r);
+    } catch(e) {
+      setOffline();
+    }
+  }
+
+  function updateUI(d, r) {
+    // Status pill
+    const pill = document.getElementById('status-pill');
+    const pillTxt = document.getElementById('status-text');
+    pill.className = 'status-pill ' + (d.online ? 'online' : 'offline');
+    pillTxt.textContent = d.online ? 'Online' : 'Offline';
+
+    // Berat
+    const beratVal = d.lock_aktif ? d.berat_terkunci : d.berat_sekarang;
+    document.getElementById('berat-now').innerHTML = kg(beratVal || 0) + '<span>kg</span>';
+    const lockBadge = document.getElementById('lock-badge');
+    if (d.lock_aktif) {
+      lockBadge.textContent = '🔒 Berat terkunci';
+      lockBadge.className = 'metric-badge badge-green';
+    } else if ((beratVal || 0) > 0.05) {
+      lockBadge.textContent = 'Mendeteksi beban...';
+      lockBadge.className = 'metric-badge badge-amber';
+    } else {
+      lockBadge.textContent = 'Menunggu beban';
+      lockBadge.className = 'metric-badge badge-gray';
+    }
+
+    // Total berat
+    document.getElementById('total-berat').innerHTML = kg(d.total_berat || 0) + '<span>kg</span>';
+    document.getElementById('transaksi-badge').textContent = r.length + ' transaksi';
+    document.getElementById('transaksi-badge').className = r.length > 0 ? 'metric-badge badge-green' : 'metric-badge badge-gray';
+
+    // Harga
+    const hp = d.harga_per_kg || 0;
+    document.getElementById('harga-kg').innerHTML = hp > 0 ? hp.toLocaleString('id-ID') + '<span>Rp</span>' : '—<span>Rp</span>';
+    const hargaBadge = document.getElementById('harga-badge');
+    hargaBadge.textContent = d.harga_disimpan ? 'Tersimpan ✓' : 'Belum disimpan';
+    hargaBadge.className = d.harga_disimpan ? 'metric-badge badge-green' : 'metric-badge badge-gray';
+
+    // Total bayar
+    document.getElementById('total-bayar').textContent = rupiah(d.total_bayar || 0);
+    const tb = d.total_berat || 0;
+    const bayarDetail = document.getElementById('bayar-detail');
+    if (tb > 0 && hp > 0) {
+      bayarDetail.textContent = kg(tb) + ' kg × Rp ' + hp.toLocaleString('id-ID');
+      bayarDetail.className = 'metric-badge badge-blue';
+    } else {
+      bayarDetail.textContent = '—';
+      bayarDetail.className = 'metric-badge badge-gray';
+    }
+
+    // Status panel — RSSI
+    const rssi = d.wifi_rssi || 0;
+    const rssiEl = document.getElementById('s-rssi');
+    rssiEl.textContent = rssi + ' dBm';
+    rssiEl.className = 'status-val ' + (rssi > -60 ? 'val-green' : rssi > -75 ? 'val-amber' : 'val-red');
+
+    // Baterai
+    const volt = d.baterai_volt || 0;
+    document.getElementById('s-bat-v').textContent = volt.toFixed(2) + ' V';
+    const pct = Math.max(0, Math.min(100, Math.round((volt - 10.5) / (13.2 - 10.5) * 100)));
+    const batFill = document.getElementById('bat-fill');
+    batFill.style.width = pct + '%';
+    batFill.style.background = pct > 60 ? '#22c55e' : pct > 30 ? '#f59e0b' : '#ef4444';
+
+    // Lock
+    const lockEl = document.getElementById('s-lock');
+    lockEl.textContent = d.lock_aktif ? 'Aktif' : 'Tidak aktif';
+    lockEl.className = 'status-val ' + (d.lock_aktif ? 'val-green' : 'val-muted');
+
+    // Harga SV
+    const svEl = document.getElementById('s-harga-sv');
+    svEl.textContent = d.harga_disimpan ? 'Tersimpan (SV)' : 'Belum disimpan';
+    svEl.className = 'status-val ' + (d.harga_disimpan ? 'val-green' : 'val-muted');
+
+    // Waktu
+    if (d.timestamp) {
+      const t = new Date(d.timestamp);
+      document.getElementById('s-time').textContent = t.toLocaleTimeString('id-ID');
+      document.getElementById('last-update-text').textContent = 'Update terakhir: ' + t.toLocaleString('id-ID');
+    }
+
+    // Riwayat tabel
+    const tbody = document.getElementById('riwayat-tbody');
+    if (r.length === 0) {
+      tbody.innerHTML = '<tr><td class="empty-row" colspan="5">Belum ada transaksi</td></tr>';
+    } else {
+      tbody.innerHTML = r.slice().reverse().map(item => `
+        <tr>
+          <td class="td-muted">#${item.id}</td>
+          <td class="mono">${parseFloat(item.berat).toFixed(2)} kg</td>
+          <td class="mono td-muted">Rp ${item.harga.toLocaleString('id-ID')}</td>
+          <td class="mono" style="color:var(--accent)">Rp ${Math.round(item.subtotal).toLocaleString('id-ID')}</td>
+          <td class="td-muted" style="font-size:12px">${item.waktu}</td>
+        </tr>`).join('');
+    }
+  }
+
+  function setOffline() {
+    document.getElementById('status-pill').className = 'status-pill offline';
+    document.getElementById('status-text').textContent = 'Offline';
+    document.getElementById('last-update-text').textContent = 'Tidak dapat terhubung ke server...';
+  }
+
+  async function hapusRiwayat() {
+    if (!confirm('Hapus semua riwayat transaksi?')) return;
+    await fetch('/api/riwayat', { method: 'DELETE' });
+    fetchData();
+  }
+
+  // Polling setiap 2 detik
+  fetchData();
+  setInterval(fetchData, 2000);
+</script>
+</body>
+</html>
