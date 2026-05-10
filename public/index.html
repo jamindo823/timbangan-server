@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Timbangan Digital</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
       --bg:#0e0f11;--surface:#16181c;--surface2:#1e2026;
@@ -67,7 +68,7 @@
     .badge-amber{background:var(--amber-dim);border-color:#f59e0b44;color:var(--amber);}
     .badge-gray{background:var(--surface2);border-color:var(--border);color:var(--muted);}
 
-    /* WHATSAPP BANNER */
+    /* WA BANNER */
     .wa-banner{display:none;background:#0a3d20;border:1px solid #22c55e44;border-radius:10px;padding:14px 18px;margin-bottom:16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
     .wa-banner.show{display:flex;}
     .wa-banner-text{font-size:13px;color:var(--green);}
@@ -85,7 +86,7 @@
     .search-bar label{font-size:12px;color:var(--muted);white-space:nowrap;}
     .search-bar input[type="date"]{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;cursor:pointer;}
     .search-bar input[type="date"]:focus{outline:none;border-color:var(--accent);}
-    .btn-reset{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+    .btn-reset{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;}
     .btn-reset:hover{border-color:var(--accent);color:var(--accent);}
     .result-badge{margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;background:var(--green-dim);border:1px solid #22c55e44;color:var(--green);}
     .tanggal-group{border-bottom:1px solid var(--border);}
@@ -112,30 +113,34 @@
     .status-val{font-size:13px;font-weight:500;font-family:'DM Mono',monospace;}
     .val-green{color:var(--green);}.val-amber{color:var(--amber);}.val-red{color:var(--red);}.val-muted{color:var(--muted);}
     .bat-track{height:4px;border-radius:2px;background:var(--border2);overflow:hidden;margin-top:4px;width:100px;}
-    .bat-fill{height:100%;border-radius:2px;transition:width 0.6s ease,background 0.4s;}
-    .btn-clear{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+    .bat-fill{height:100%;border-radius:2px;transition:width 0.6s,background 0.4s;}
+    .btn-clear{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;}
     .btn-clear:hover{border-color:var(--red);color:var(--red);background:var(--red-dim);}
     .last-update{font-size:11px;color:var(--hint);text-align:right;padding:10px 0 0;}
 
-    /* MODAL WHATSAPP */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:24px;}
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;align-items:center;justify-content:center;padding:24px;}
     .modal-overlay.show{display:flex;}
-    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:400px;}
-    .modal-title{font-size:15px;font-weight:600;margin-bottom:6px;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:420px;}
+    .modal-title{font-size:15px;font-weight:600;margin-bottom:4px;}
     .modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px;}
-    .modal-preview{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;font-size:13px;font-family:'DM Mono',monospace;color:var(--text);line-height:1.8;margin-bottom:20px;white-space:pre;}
+    .modal-preview{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;font-size:12px;font-family:'DM Mono',monospace;color:var(--text);line-height:1.9;margin-bottom:20px;white-space:pre;}
     .modal-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block;}
-    .modal-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;margin-bottom:16px;}
+    .modal-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;margin-bottom:20px;}
     .modal-input:focus{outline:none;border-color:var(--accent);}
+    .modal-divider{font-size:11px;color:var(--hint);text-align:center;margin-bottom:14px;}
     .modal-actions{display:flex;gap:10px;}
-    .btn-batal{flex:1;background:none;border:1px solid var(--border2);color:var(--muted);border-radius:8px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;}
-    .btn-kirim{flex:2;background:#22c55e;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;}
-    .btn-kirim:hover{opacity:0.85;}
+    .btn-batal{background:none;border:1px solid var(--border2);color:var(--muted);border-radius:8px;padding:10px 16px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+    .btn-kirim-pesan{flex:1;background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity 0.15s;}
+    .btn-kirim-pesan:hover{opacity:0.85;}
+    .btn-kirim-pdf{flex:1;background:#22c55e;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity 0.15s;}
+    .btn-kirim-pdf:hover{opacity:0.85;}
+    .info-pdf{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;}
   </style>
 </head>
 <body>
 
-<!-- HALAMAN LOGIN -->
+<!-- LOGIN -->
 <div id="login-page" class="login-wrap">
   <div class="login-card">
     <div class="login-logo">
@@ -152,31 +157,23 @@
   </div>
 </div>
 
-<!-- HALAMAN DASHBOARD -->
+<!-- DASHBOARD -->
 <div id="dashboard-page" style="display:none;">
-
   <div class="topbar">
     <div class="topbar-left">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm2 4h14v2H5zm-2 4h18v2H3zm2 4h14v2H5z"/></svg>
-      </div>
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm2 4h14v2H5zm-2 4h18v2H3zm2 4h14v2H5z"/></svg></div>
       <div>
         <div class="app-name">Timbangan Digital</div>
         <div class="app-sub">ESP32 · Real-time Dashboard</div>
       </div>
     </div>
     <div class="topbar-right">
-      <div class="status-pill offline" id="status-pill">
-        <div class="dot"></div>
-        <span id="status-text">Offline</span>
-      </div>
+      <div class="status-pill offline" id="status-pill"><div class="dot"></div><span id="status-text">Offline</span></div>
       <button class="btn-logout" onclick="doLogout()">Keluar</button>
     </div>
   </div>
 
   <div class="main">
-
-    <!-- METRIC CARDS -->
     <div class="metrics">
       <div class="metric-card green">
         <div class="metric-label">Berat sekarang</div>
@@ -200,16 +197,15 @@
       </div>
     </div>
 
-    <!-- WHATSAPP BANNER -->
+    <!-- WA BANNER -->
     <div class="wa-banner" id="wa-banner">
       <div class="wa-banner-text">
         <strong>Total bayar sudah dihitung!</strong>
         Kirim hasil penimbangan ke WhatsApp pelanggan
       </div>
-      <button class="btn-wa" onclick="bukaModalWA()">Kirim ke WhatsApp</button>
+      <button class="btn-wa" onclick="bukaModalWA()">📤 Kirim ke WhatsApp</button>
     </div>
 
-    <!-- BOTTOM GRID -->
     <div class="bottom-grid">
       <div class="section-card">
         <div class="section-head">
@@ -222,9 +218,7 @@
           <button class="btn-reset" onclick="resetFilter()">Reset</button>
           <span class="result-badge" id="result-badge" style="display:none"></span>
         </div>
-        <div id="riwayat-container">
-          <div class="empty-state">Belum ada data transaksi</div>
-        </div>
+        <div id="riwayat-container"><div class="empty-state">Belum ada data transaksi</div></div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px;">
@@ -255,62 +249,161 @@
 <!-- MODAL WHATSAPP -->
 <div class="modal-overlay" id="modal-wa">
   <div class="modal-box">
-    <div class="modal-title">Kirim ke WhatsApp</div>
-    <div class="modal-sub">Preview pesan yang akan dikirim</div>
+    <div class="modal-title">📤 Kirim Hasil Penimbangan</div>
+    <div class="modal-sub">Preview struk yang akan dikirim</div>
     <div class="modal-preview" id="wa-preview"></div>
     <label class="modal-label">Nomor HP tujuan (contoh: 08123456789)</label>
     <input class="modal-input" type="tel" id="inp-nomor" placeholder="08xxxxxxxxxx" />
+    <div class="modal-divider">— Pilih cara kirim —</div>
     <div class="modal-actions">
       <button class="btn-batal" onclick="tutupModalWA()">Batal</button>
-      <button class="btn-kirim" onclick="kirimWA()">Kirim WhatsApp</button>
+      <button class="btn-kirim-pesan" onclick="kirimPesan()">💬 Kirim Pesan</button>
+      <button class="btn-kirim-pdf" onclick="kirimPDF()">📄 Kirim PDF</button>
     </div>
+    <div class="info-pdf">PDF: struk didownload → buka WhatsApp → kirim file PDF</div>
   </div>
 </div>
 
 <script>
-  const KREDENSIAL = { user: 'admin', pass: 't.digital' };
+  const KREDENSIAL = {user:'admin',pass:'t.digital'};
   let allRiwayat = [];
   let dataAktif = {};
   let totalBayarTerakhir = 0;
-  let waBannerSudahMuncul = false;
 
   function doLogin() {
     const u = document.getElementById('inp-user').value.trim();
     const p = document.getElementById('inp-pass').value;
-    if (u === KREDENSIAL.user && p === KREDENSIAL.pass) {
-      document.getElementById('login-page').style.display = 'none';
-      document.getElementById('dashboard-page').style.display = 'block';
-      sessionStorage.setItem('loggedin', '1');
-      fetchData();
-      setInterval(fetchData, 2000);
+    if (u===KREDENSIAL.user && p===KREDENSIAL.pass) {
+      document.getElementById('login-page').style.display='none';
+      document.getElementById('dashboard-page').style.display='block';
+      sessionStorage.setItem('loggedin','1');
+      mulaiDashboard();
     } else {
-      document.getElementById('login-err').style.display = 'block';
+      document.getElementById('login-err').style.display='block';
     }
   }
 
   function doLogout() {
     sessionStorage.removeItem('loggedin');
-    document.getElementById('dashboard-page').style.display = 'none';
-    document.getElementById('login-page').style.display = 'flex';
-    document.getElementById('inp-user').value = '';
-    document.getElementById('inp-pass').value = '';
+    document.getElementById('dashboard-page').style.display='none';
+    document.getElementById('login-page').style.display='flex';
+    document.getElementById('inp-user').value='';
+    document.getElementById('inp-pass').value='';
   }
 
-  if (sessionStorage.getItem('loggedin') === '1') {
-    document.getElementById('login-page').style.display = 'none';
-    document.getElementById('dashboard-page').style.display = 'block';
+  function mulaiDashboard() {
     fetchData();
     setInterval(fetchData, 2000);
   }
 
-  function rupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
-  function kg(n) { return parseFloat(n).toFixed(2); }
+  if (sessionStorage.getItem('loggedin')==='1') {
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('dashboard-page').style.display='block';
+    mulaiDashboard();
+  }
+
+  function rupiah(n){return 'Rp '+Math.round(n).toLocaleString('id-ID');}
+  function kg(n){return parseFloat(n).toFixed(2);}
+
+  function buatTeksStruk() {
+    const tgl = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const tb  = parseFloat(dataAktif.total_berat||0).toFixed(2);
+    const hp  = Math.round(dataAktif.harga_per_kg||0).toLocaleString('id-ID');
+    const bay = Math.round(dataAktif.total_bayar||0).toLocaleString('id-ID');
+    return `HASIL PENIMBANGAN SAWIT\n${tgl}\n\nTotal berat    : ${tb} kg\nHarga per kg   : Rp ${hp}\nTotal bayar    : Rp ${bay}\n\n        TERIMAKASIH`;
+  }
+
+  function bukaModalWA() {
+    document.getElementById('wa-preview').textContent = buatTeksStruk();
+    document.getElementById('inp-nomor').value='';
+    document.getElementById('modal-wa').classList.add('show');
+  }
+
+  function tutupModalWA() {
+    document.getElementById('modal-wa').classList.remove('show');
+  }
+
+  function getNomor() {
+    let nomor = document.getElementById('inp-nomor').value.trim().replace(/\D/g,'');
+    if (!nomor) { alert('Masukkan nomor HP dulu!'); return null; }
+    if (nomor.startsWith('0')) nomor = '62'+nomor.slice(1);
+    return nomor;
+  }
+
+  function kirimPesan() {
+    const nomor = getNomor();
+    if (!nomor) return;
+    const pesan = encodeURIComponent(buatTeksStruk());
+    window.open(`https://wa.me/${nomor}?text=${pesan}`,'_blank');
+    tutupModalWA();
+  }
+
+  function kirimPDF() {
+    const nomor = getNomor();
+    if (!nomor) return;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'mm', format:[80,120] });
+
+    const tgl = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const tb  = parseFloat(dataAktif.total_berat||0).toFixed(2);
+    const hp  = Math.round(dataAktif.harga_per_kg||0).toLocaleString('id-ID');
+    const bay = Math.round(dataAktif.total_bayar||0).toLocaleString('id-ID');
+
+    // Header
+    doc.setFontSize(11);
+    doc.setFont('helvetica','bold');
+    doc.text('HASIL PENIMBANGAN SAWIT', 40, 14, {align:'center'});
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    doc.text(tgl, 40, 20, {align:'center'});
+
+    // Garis
+    doc.setLineWidth(0.3);
+    doc.line(5, 24, 75, 24);
+
+    // Isi
+    doc.setFontSize(10);
+    doc.setFont('helvetica','normal');
+    doc.text('Total berat', 7, 32);
+    doc.text(`: ${tb} kg`, 42, 32);
+
+    doc.text('Harga per kg', 7, 40);
+    doc.text(`: Rp ${hp}`, 42, 40);
+
+    // Garis sebelum total
+    doc.line(5, 44, 75, 44);
+
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.text('Total bayar', 7, 52);
+    doc.text(`: Rp ${bay}`, 42, 52);
+
+    // Garis bawah
+    doc.line(5, 56, 75, 56);
+
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.text('TERIMAKASIH', 40, 64, {align:'center'});
+
+    // Download PDF
+    doc.save(`struk-sawit-${tgl.replace(/\//g,'-')}.pdf`);
+
+    // Buka WhatsApp dengan nomor tujuan
+    setTimeout(() => {
+      const pesan = encodeURIComponent(`Berikut struk penimbangan sawit tanggal ${tgl}. Silakan cek file PDF yang telah dikirim.`);
+      window.open(`https://wa.me/${nomor}?text=${pesan}`,'_blank');
+    }, 1000);
+
+    tutupModalWA();
+  }
 
   function groupByTanggal(data) {
     const groups = {};
     data.forEach(item => {
-      const tgl = item.tanggal || 'Tanggal tidak diketahui';
-      if (!groups[tgl]) groups[tgl] = [];
+      const tgl = item.tanggal||'Tanggal tidak diketahui';
+      if (!groups[tgl]) groups[tgl]=[];
       groups[tgl].push(item);
     });
     return groups;
@@ -318,20 +411,17 @@
 
   function renderRiwayat(data) {
     const container = document.getElementById('riwayat-container');
-    if (data.length === 0) {
-      container.innerHTML = '<div class="empty-state">Tidak ada data untuk tanggal ini</div>';
-      return;
-    }
+    if (data.length===0) { container.innerHTML='<div class="empty-state">Tidak ada data untuk tanggal ini</div>'; return; }
     const groups = groupByTanggal(data);
-    const tanggalList = Object.keys(groups).sort((a, b) => {
-      const parse = t => { const p = t.split('/'); return p.length===3 ? new Date(p[2],p[1]-1,p[0]).getTime() : 0; };
-      return parse(b) - parse(a);
+    const tanggalList = Object.keys(groups).sort((a,b)=>{
+      const parse=t=>{const p=t.split('/');return p.length===3?new Date(p[2],p[1]-1,p[0]).getTime():0;};
+      return parse(b)-parse(a);
     });
-    container.innerHTML = tanggalList.map(tgl => {
-      const items = groups[tgl];
-      const totalBerat = items.reduce((s,i) => s + parseFloat(i.berat||0), 0);
-      const totalBayar = items.reduce((s,i) => s + parseFloat(i.subtotal||0), 0);
-      const rows = items.slice().reverse().map(item => `
+    container.innerHTML = tanggalList.map(tgl=>{
+      const items=groups[tgl];
+      const totalBerat=items.reduce((s,i)=>s+parseFloat(i.berat||0),0);
+      const totalBayar=items.reduce((s,i)=>s+parseFloat(i.subtotal||0),0);
+      const rows=items.slice().reverse().map(item=>`
         <tr>
           <td class="td-muted">#${item.id}</td>
           <td class="mono">${parseFloat(item.berat).toFixed(2)} kg</td>
@@ -358,123 +448,93 @@
   }
 
   function filterRiwayat() {
-    const input = document.getElementById('filter-tanggal').value;
-    const badge = document.getElementById('result-badge');
-    if (!input) { renderRiwayat(allRiwayat); badge.style.display='none'; return; }
-    const d = new Date(input);
-    const tglCari = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-    const filtered = allRiwayat.filter(item => item.tanggal === tglCari);
+    const input=document.getElementById('filter-tanggal').value;
+    const badge=document.getElementById('result-badge');
+    if (!input){renderRiwayat(allRiwayat);badge.style.display='none';return;}
+    const d=new Date(input);
+    const tglCari=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    const filtered=allRiwayat.filter(item=>item.tanggal===tglCari);
     renderRiwayat(filtered);
-    badge.style.display = 'inline-flex';
-    badge.textContent = filtered.length + ' transaksi ditemukan';
+    badge.style.display='inline-flex';
+    badge.textContent=filtered.length+' transaksi ditemukan';
   }
 
   function resetFilter() {
-    document.getElementById('filter-tanggal').value = '';
-    document.getElementById('result-badge').style.display = 'none';
+    document.getElementById('filter-tanggal').value='';
+    document.getElementById('result-badge').style.display='none';
     renderRiwayat(allRiwayat);
-  }
-
-  function buatPesanWA() {
-    const tgl = new Date().toLocaleDateString('id-ID', {day:'2-digit',month:'2-digit',year:'numeric'});
-    const tb = parseFloat(dataAktif.total_berat||0).toFixed(2);
-    const hp = Math.round(dataAktif.harga_per_kg||0).toLocaleString('id-ID');
-    const bayar = Math.round(dataAktif.total_bayar||0).toLocaleString('id-ID');
-    return `HASIL PENIMBANGAN SAWIT\n${tgl}\n\nTotal berat    : ${tb} kg\nHarga per kg   : Rp ${hp}\nTotal bayar    : Rp ${bayar}\n\n        TERIMAKASIH`;
-  }
-
-  function bukaModalWA() {
-    document.getElementById('wa-preview').textContent = buatPesanWA();
-    document.getElementById('inp-nomor').value = '';
-    document.getElementById('modal-wa').classList.add('show');
-  }
-
-  function tutupModalWA() {
-    document.getElementById('modal-wa').classList.remove('show');
-  }
-
-  function kirimWA() {
-    let nomor = document.getElementById('inp-nomor').value.trim().replace(/\D/g,'');
-    if (!nomor) { alert('Masukkan nomor HP dulu!'); return; }
-    if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
-    const pesan = encodeURIComponent(buatPesanWA());
-    window.open(`https://wa.me/${nomor}?text=${pesan}`, '_blank');
-    tutupModalWA();
   }
 
   async function fetchData() {
     try {
-      const [dataRes, riwayatRes] = await Promise.all([fetch('/api/data'), fetch('/api/riwayat')]);
-      const d = await dataRes.json();
-      const r = await riwayatRes.json();
-      allRiwayat = r;
-      dataAktif = d;
+      const [dataRes,riwayatRes]=await Promise.all([fetch('/api/data'),fetch('/api/riwayat')]);
+      const d=await dataRes.json();
+      const r=await riwayatRes.json();
+      allRiwayat=r; dataAktif=d;
       updateUI(d);
-      const filterAktif = document.getElementById('filter-tanggal').value;
-      if (filterAktif) { filterRiwayat(); } else { renderRiwayat(allRiwayat); }
-      document.getElementById('transaksi-badge').textContent = r.length + ' transaksi';
-      document.getElementById('transaksi-badge').className = r.length > 0 ? 'metric-badge badge-green' : 'metric-badge badge-gray';
-
-      // Tampilkan banner WA kalau total bayar > 0 dan baru berubah
-      const bayarBaru = d.total_bayar || 0;
-      if (bayarBaru > 0 && bayarBaru !== totalBayarTerakhir) {
-        totalBayarTerakhir = bayarBaru;
+      const filterAktif=document.getElementById('filter-tanggal').value;
+      if (filterAktif){filterRiwayat();}else{renderRiwayat(allRiwayat);}
+      document.getElementById('transaksi-badge').textContent=r.length+' transaksi';
+      document.getElementById('transaksi-badge').className=r.length>0?'metric-badge badge-green':'metric-badge badge-gray';
+      const bayarBaru=d.total_bayar||0;
+      if (bayarBaru>0 && bayarBaru!==totalBayarTerakhir) {
+        totalBayarTerakhir=bayarBaru;
         document.getElementById('wa-banner').classList.add('show');
       }
-    } catch(e) { setOffline(); }
+    } catch(e){setOffline();}
   }
 
   function updateUI(d) {
-    document.getElementById('status-pill').className = 'status-pill ' + (d.online ? 'online' : 'offline');
-    document.getElementById('status-text').textContent = d.online ? 'Online' : 'Offline';
-    const beratVal = d.lock_aktif ? d.berat_terkunci : d.berat_sekarang;
-    document.getElementById('berat-now').innerHTML = kg(beratVal||0) + '<span>kg</span>';
-    const lockBadge = document.getElementById('lock-badge');
-    if (d.lock_aktif) { lockBadge.textContent='🔒 Berat terkunci'; lockBadge.className='metric-badge badge-green'; }
-    else if ((beratVal||0)>0.05) { lockBadge.textContent='Mendeteksi beban...'; lockBadge.className='metric-badge badge-amber'; }
-    else { lockBadge.textContent='Menunggu beban'; lockBadge.className='metric-badge badge-gray'; }
-    document.getElementById('total-berat').innerHTML = kg(d.total_berat||0) + '<span>kg</span>';
-    const hp = d.harga_per_kg||0;
-    document.getElementById('harga-kg').innerHTML = hp>0 ? hp.toLocaleString('id-ID')+'<span>Rp</span>' : '—<span>Rp</span>';
-    document.getElementById('harga-badge').textContent = d.harga_disimpan ? 'Tersimpan ✓' : 'Belum disimpan';
-    document.getElementById('harga-badge').className = d.harga_disimpan ? 'metric-badge badge-green' : 'metric-badge badge-gray';
-    document.getElementById('total-bayar').textContent = rupiah(d.total_bayar||0);
-    const tb = d.total_berat||0;
-    if (tb>0 && hp>0) { document.getElementById('bayar-detail').textContent=kg(tb)+' kg × Rp '+hp.toLocaleString('id-ID'); document.getElementById('bayar-detail').className='metric-badge badge-green'; }
-    else { document.getElementById('bayar-detail').textContent='—'; document.getElementById('bayar-detail').className='metric-badge badge-gray'; }
-    const rssi = d.wifi_rssi||0;
-    const rssiEl = document.getElementById('s-rssi');
-    rssiEl.textContent = rssi+' dBm';
-    rssiEl.className = 'status-val '+(rssi>-60?'val-green':rssi>-75?'val-amber':'val-red');
-    const volt = d.baterai_volt||0;
-    document.getElementById('s-bat-v').textContent = volt.toFixed(2)+' V';
-    const pct = Math.max(0,Math.min(100,Math.round((volt-10.5)/(13.2-10.5)*100)));
-    const batFill = document.getElementById('bat-fill');
-    batFill.style.width = pct+'%';
-    batFill.style.background = pct>60?'#22c55e':pct>30?'#f59e0b':'#ef4444';
-    document.getElementById('s-lock').textContent = d.lock_aktif?'Aktif':'Tidak aktif';
-    document.getElementById('s-lock').className = 'status-val '+(d.lock_aktif?'val-green':'val-muted');
-    document.getElementById('s-harga-sv').textContent = d.harga_disimpan?'Tersimpan (SV)':'Belum disimpan';
-    document.getElementById('s-harga-sv').className = 'status-val '+(d.harga_disimpan?'val-green':'val-muted');
-    if (d.timestamp) {
-      const t = new Date(d.timestamp);
-      document.getElementById('s-time').textContent = t.toLocaleTimeString('id-ID');
-      document.getElementById('last-update-text').textContent = 'Update terakhir: '+t.toLocaleString('id-ID');
+    document.getElementById('status-pill').className='status-pill '+(d.online?'online':'offline');
+    document.getElementById('status-text').textContent=d.online?'Online':'Offline';
+    const beratVal=d.lock_aktif?d.berat_terkunci:d.berat_sekarang;
+    document.getElementById('berat-now').innerHTML=kg(beratVal||0)+'<span>kg</span>';
+    const lb=document.getElementById('lock-badge');
+    if(d.lock_aktif){lb.textContent='🔒 Berat terkunci';lb.className='metric-badge badge-green';}
+    else if((beratVal||0)>0.05){lb.textContent='Mendeteksi beban...';lb.className='metric-badge badge-amber';}
+    else{lb.textContent='Menunggu beban';lb.className='metric-badge badge-gray';}
+    document.getElementById('total-berat').innerHTML=kg(d.total_berat||0)+'<span>kg</span>';
+    const hp=d.harga_per_kg||0;
+    document.getElementById('harga-kg').innerHTML=hp>0?hp.toLocaleString('id-ID')+'<span>Rp</span>':'—<span>Rp</span>';
+    document.getElementById('harga-badge').textContent=d.harga_disimpan?'Tersimpan ✓':'Belum disimpan';
+    document.getElementById('harga-badge').className=d.harga_disimpan?'metric-badge badge-green':'metric-badge badge-gray';
+    document.getElementById('total-bayar').textContent=rupiah(d.total_bayar||0);
+    const tb=d.total_berat||0;
+    if(tb>0&&hp>0){document.getElementById('bayar-detail').textContent=kg(tb)+' kg × Rp '+hp.toLocaleString('id-ID');document.getElementById('bayar-detail').className='metric-badge badge-green';}
+    else{document.getElementById('bayar-detail').textContent='—';document.getElementById('bayar-detail').className='metric-badge badge-gray';}
+    const rssi=d.wifi_rssi||0;
+    const rssiEl=document.getElementById('s-rssi');
+    rssiEl.textContent=rssi+' dBm';
+    rssiEl.className='status-val '+(rssi>-60?'val-green':rssi>-75?'val-amber':'val-red');
+    const volt=d.baterai_volt||0;
+    document.getElementById('s-bat-v').textContent=volt.toFixed(2)+' V';
+    const pct=Math.max(0,Math.min(100,Math.round((volt-10.5)/(13.2-10.5)*100)));
+    const bf=document.getElementById('bat-fill');
+    bf.style.width=pct+'%';
+    bf.style.background=pct>60?'#22c55e':pct>30?'#f59e0b':'#ef4444';
+    document.getElementById('s-lock').textContent=d.lock_aktif?'Aktif':'Tidak aktif';
+    document.getElementById('s-lock').className='status-val '+(d.lock_aktif?'val-green':'val-muted');
+    document.getElementById('s-harga-sv').textContent=d.harga_disimpan?'Tersimpan (SV)':'Belum disimpan';
+    document.getElementById('s-harga-sv').className='status-val '+(d.harga_disimpan?'val-green':'val-muted');
+    if(d.timestamp){
+      const t=new Date(d.timestamp);
+      document.getElementById('s-time').textContent=t.toLocaleTimeString('id-ID');
+      document.getElementById('last-update-text').textContent='Update terakhir: '+t.toLocaleString('id-ID');
     }
   }
 
-  function setOffline() {
-    document.getElementById('status-pill').className = 'status-pill offline';
-    document.getElementById('status-text').textContent = 'Offline';
-    document.getElementById('last-update-text').textContent = 'Tidak dapat terhubung ke server...';
+  function setOffline(){
+    document.getElementById('status-pill').className='status-pill offline';
+    document.getElementById('status-text').textContent='Offline';
+    document.getElementById('last-update-text').textContent='Tidak dapat terhubung ke server...';
   }
 
-  async function hapusRiwayat() {
-    if (!confirm('Hapus semua riwayat transaksi?')) return;
-    await fetch('/api/riwayat', {method:'DELETE'});
-    allRiwayat = []; renderRiwayat([]); resetFilter();
+  async function hapusRiwayat(){
+    if(!confirm('Hapus semua riwayat transaksi?'))return;
+    await fetch('/api/riwayat',{method:'DELETE'});
+    allRiwayat=[];renderRiwayat([]);resetFilter();
     document.getElementById('wa-banner').classList.remove('show');
-    totalBayarTerakhir = 0;
+    totalBayarTerakhir=0;
   }
 </script>
 </body>
