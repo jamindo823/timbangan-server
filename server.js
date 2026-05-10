@@ -50,7 +50,8 @@ app.post("/api/data", (req, res) => {
       berat     : selisih,
       harga     : d.harga_per_kg,
       subtotal  : Math.round(selisih * d.harga_per_kg),
-      waktu     : new Date().toLocaleString("id-ID", {timeZone: "Asia/Jakarta", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"})
+      waktu     : new Date().toLocaleTimeString("id-ID", {timeZone: "Asia/Jakarta"}),
+      tanggal   : new Date().toLocaleDateString("id-ID", {timeZone: "Asia/Jakarta", day: "2-digit", month: "2-digit", year: "numeric"})
     });
     if (riwayat.length > 100) riwayat.shift(); // buang yang paling lama
   }
