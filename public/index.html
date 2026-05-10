@@ -4,175 +4,304 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Timbangan Digital</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0e0f11; --surface: #16181c; --surface2: #1e2026;
-      --border: #2a2d35; --border2: #363a44; --text: #e8eaf0;
-      --muted: #8890a4; --hint: #525869;
-      --green: #22c55e; --green-dim: #16a34a33;
-      --amber: #f59e0b; --amber-dim: #d9770633;
-      --red: #ef4444; --red-dim: #dc262633;
-      --blue: #60a5fa; --blue-dim: #2563eb33;
-      --accent: #6ee7b7;
+      --bg:#0e0f11;--surface:#16181c;--surface2:#1e2026;
+      --border:#2a2d35;--border2:#363a44;--text:#e8eaf0;
+      --muted:#8890a4;--hint:#525869;
+      --green:#22c55e;--green-dim:#16a34a33;
+      --amber:#f59e0b;--amber-dim:#d9770633;
+      --red:#ef4444;--red-dim:#dc262633;
+      --blue:#60a5fa;--blue-dim:#2563eb33;
+      --accent:#6ee7b7;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
-    .topbar-left { display: flex; align-items: center; gap: 12px; }
-    .logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-    .logo-icon svg { width: 18px; height: 18px; fill: #0e0f11; }
-    .app-name { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
-    .app-sub { font-size: 11px; color: var(--muted); }
-    .status-pill { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; border: 1px solid; font-size: 12px; font-weight: 500; transition: all 0.3s; }
-    .status-pill.online { background: var(--green-dim); border-color: #22c55e55; color: var(--green); }
-    .status-pill.offline { background: var(--red-dim); border-color: #ef444455; color: var(--red); }
-    .status-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-    .status-pill.online .dot { animation: blink 1.4s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .main { padding: 20px 24px; max-width: 1100px; margin: 0 auto; }
-    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 16px; }
-    .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; position: relative; overflow: hidden; }
-    .metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent-line, var(--border)); border-radius: 12px 12px 0 0; }
-    .metric-card.green::before { --accent-line: var(--green); }
-    .metric-card.amber::before { --accent-line: var(--amber); }
-    .metric-card.blue::before  { --accent-line: var(--blue); }
-    .metric-card.accent::before { --accent-line: var(--accent); }
-    .metric-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
-    .metric-value { font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 500; letter-spacing: -1px; color: var(--text); line-height: 1; }
-    .metric-value span { font-size: 14px; color: var(--muted); font-weight: 400; margin-left: 3px; }
-    .metric-badge { display: inline-flex; align-items: center; margin-top: 8px; font-size: 11px; padding: 3px 8px; border-radius: 20px; border: 1px solid; }
-    .badge-green { background: var(--green-dim); border-color: #22c55e44; color: var(--green); }
-    .badge-amber { background: var(--amber-dim); border-color: #f59e0b44; color: var(--amber); }
-    .badge-gray  { background: var(--surface2); border-color: var(--border); color: var(--muted); }
-    .bottom-grid { display: grid; grid-template-columns: 1fr 320px; gap: 12px; }
-    @media (max-width: 720px) { .bottom-grid { grid-template-columns: 1fr; } }
-    .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-    .section-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
-    .section-title { font-size: 13px; font-weight: 600; color: var(--text); }
-    .search-bar { display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-bottom: 1px solid var(--border); background: var(--surface2); flex-wrap: wrap; }
-    .search-bar label { font-size: 12px; color: var(--muted); white-space: nowrap; }
-    .search-bar input[type="date"] { background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 5px 10px; font-size: 13px; color: var(--text); font-family: 'DM Sans', sans-serif; cursor: pointer; }
-    .search-bar input[type="date"]:focus { outline: none; border-color: var(--accent); }
-    .btn-reset { background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-    .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
-    .result-badge { margin-left: auto; font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--green-dim); border: 1px solid #22c55e44; color: var(--green); }
-    .tanggal-group { border-bottom: 1px solid var(--border); }
-    .tanggal-group:last-child { border-bottom: none; }
-    .tanggal-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; background: var(--surface2); flex-wrap: wrap; gap: 6px; }
-    .tanggal-label { font-size: 12px; font-weight: 500; color: var(--muted); }
-    .tanggal-summary { display: flex; gap: 16px; flex-wrap: wrap; }
-    .sum-item { font-size: 12px; color: var(--hint); }
-    .sum-item span { color: var(--muted); font-weight: 500; }
-    .sum-item span.green { color: var(--green); }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead th { text-align: left; padding: 8px 18px; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); }
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--surface2); }
-    tbody td { padding: 10px 18px; }
-    .mono { font-family: 'DM Mono', monospace; }
-    .td-muted { color: var(--muted); }
-    .td-green { color: var(--green); }
-    .empty-state { text-align: center; padding: 32px; color: var(--hint); font-size: 13px; }
-    .status-list { display: flex; flex-direction: column; gap: 10px; }
-    .status-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); }
-    .status-key { font-size: 13px; color: var(--muted); }
-    .status-val { font-size: 13px; font-weight: 500; font-family: 'DM Mono', monospace; }
-    .val-green { color: var(--green); } .val-amber { color: var(--amber); } .val-red { color: var(--red); } .val-muted { color: var(--muted); }
-    .bat-track { height: 4px; border-radius: 2px; background: var(--border2); overflow: hidden; margin-top: 4px; width: 100px; }
-    .bat-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease, background 0.4s; }
-    .btn-clear { background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-    .btn-clear:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
-    .last-update { font-size: 11px; color: var(--hint); text-align: right; padding: 10px 0 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+    /* LOGIN */
+    .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:360px;}
+    .login-logo{width:48px;height:48px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+    .login-logo svg{width:26px;height:26px;fill:#0e0f11;}
+    .login-title{text-align:center;font-size:18px;font-weight:600;margin-bottom:4px;}
+    .login-sub{text-align:center;font-size:12px;color:var(--muted);margin-bottom:28px;}
+    .login-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block;}
+    .login-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;margin-bottom:16px;}
+    .login-input:focus{outline:none;border-color:var(--accent);}
+    .login-btn{width:100%;background:var(--accent);color:#0e0f11;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity 0.15s;}
+    .login-btn:hover{opacity:0.85;}
+    .login-err{font-size:12px;color:var(--red);text-align:center;margin-top:12px;display:none;}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+    .topbar-left{display:flex;align-items:center;gap:12px;}
+    .logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+    .logo-icon svg{width:18px;height:18px;fill:#0e0f11;}
+    .app-name{font-size:15px;font-weight:600;letter-spacing:-0.3px;}
+    .app-sub{font-size:11px;color:var(--muted);}
+    .topbar-right{display:flex;align-items:center;gap:10px;}
+    .status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid;font-size:12px;font-weight:500;transition:all 0.3s;}
+    .status-pill.online{background:var(--green-dim);border-color:#22c55e55;color:var(--green);}
+    .status-pill.offline{background:var(--red-dim);border-color:#ef444455;color:var(--red);}
+    .status-pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+    .status-pill.online .dot{animation:blink 1.4s infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+    .btn-logout{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+    .btn-logout:hover{border-color:var(--red);color:var(--red);}
+
+    /* MAIN */
+    .main{padding:20px 24px;max-width:1100px;margin:0 auto;}
+    .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px;}
+    .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+    .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent-line,var(--border));border-radius:12px 12px 0 0;}
+    .metric-card.green::before{--accent-line:var(--green);}
+    .metric-card.amber::before{--accent-line:var(--amber);}
+    .metric-card.blue::before{--accent-line:var(--blue);}
+    .metric-card.accent::before{--accent-line:var(--accent);}
+    .metric-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+    .metric-value{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;letter-spacing:-1px;color:var(--text);line-height:1;}
+    .metric-value span{font-size:14px;color:var(--muted);font-weight:400;margin-left:3px;}
+    .metric-badge{display:inline-flex;align-items:center;margin-top:8px;font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid;}
+    .badge-green{background:var(--green-dim);border-color:#22c55e44;color:var(--green);}
+    .badge-amber{background:var(--amber-dim);border-color:#f59e0b44;color:var(--amber);}
+    .badge-gray{background:var(--surface2);border-color:var(--border);color:var(--muted);}
+
+    /* WHATSAPP BANNER */
+    .wa-banner{display:none;background:#0a3d20;border:1px solid #22c55e44;border-radius:10px;padding:14px 18px;margin-bottom:16px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .wa-banner.show{display:flex;}
+    .wa-banner-text{font-size:13px;color:var(--green);}
+    .wa-banner-text strong{display:block;font-size:14px;margin-bottom:2px;}
+    .btn-wa{background:#22c55e;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity 0.15s;}
+    .btn-wa:hover{opacity:0.85;}
+
+    /* BOTTOM GRID */
+    .bottom-grid{display:grid;grid-template-columns:1fr 320px;gap:12px;}
+    @media(max-width:720px){.bottom-grid{grid-template-columns:1fr;}}
+    .section-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+    .section-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+    .section-title{font-size:13px;font-weight:600;color:var(--text);}
+    .search-bar{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface2);flex-wrap:wrap;}
+    .search-bar label{font-size:12px;color:var(--muted);white-space:nowrap;}
+    .search-bar input[type="date"]{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;cursor:pointer;}
+    .search-bar input[type="date"]:focus{outline:none;border-color:var(--accent);}
+    .btn-reset{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+    .btn-reset:hover{border-color:var(--accent);color:var(--accent);}
+    .result-badge{margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;background:var(--green-dim);border:1px solid #22c55e44;color:var(--green);}
+    .tanggal-group{border-bottom:1px solid var(--border);}
+    .tanggal-group:last-child{border-bottom:none;}
+    .tanggal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:var(--surface2);flex-wrap:wrap;gap:6px;}
+    .tanggal-label{font-size:12px;font-weight:500;color:var(--muted);}
+    .tanggal-summary{display:flex;gap:16px;flex-wrap:wrap;}
+    .sum-item{font-size:12px;color:var(--hint);}
+    .sum-item span{color:var(--muted);font-weight:500;}
+    .sum-item span.green{color:var(--green);}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    thead th{text-align:left;padding:8px 18px;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--border);}
+    tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:var(--surface2);}
+    tbody td{padding:10px 18px;}
+    .mono{font-family:'DM Mono',monospace;}
+    .td-muted{color:var(--muted);}
+    .td-green{color:var(--green);}
+    .empty-state{text-align:center;padding:32px;color:var(--hint);font-size:13px;}
+    .status-list{display:flex;flex-direction:column;gap:10px;}
+    .status-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
+    .status-key{font-size:13px;color:var(--muted);}
+    .status-val{font-size:13px;font-weight:500;font-family:'DM Mono',monospace;}
+    .val-green{color:var(--green);}.val-amber{color:var(--amber);}.val-red{color:var(--red);}.val-muted{color:var(--muted);}
+    .bat-track{height:4px;border-radius:2px;background:var(--border2);overflow:hidden;margin-top:4px;width:100px;}
+    .bat-fill{height:100%;border-radius:2px;transition:width 0.6s ease,background 0.4s;}
+    .btn-clear{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+    .btn-clear:hover{border-color:var(--red);color:var(--red);background:var(--red-dim);}
+    .last-update{font-size:11px;color:var(--hint);text-align:right;padding:10px 0 0;}
+
+    /* MODAL WHATSAPP */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:24px;}
+    .modal-overlay.show{display:flex;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:400px;}
+    .modal-title{font-size:15px;font-weight:600;margin-bottom:6px;}
+    .modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px;}
+    .modal-preview{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;font-size:13px;font-family:'DM Mono',monospace;color:var(--text);line-height:1.8;margin-bottom:20px;white-space:pre;}
+    .modal-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block;}
+    .modal-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;margin-bottom:16px;}
+    .modal-input:focus{outline:none;border-color:var(--accent);}
+    .modal-actions{display:flex;gap:10px;}
+    .btn-batal{flex:1;background:none;border:1px solid var(--border2);color:var(--muted);border-radius:8px;padding:10px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+    .btn-kirim{flex:2;background:#22c55e;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;}
+    .btn-kirim:hover{opacity:0.85;}
   </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-left">
-    <div class="logo-icon">
+<!-- HALAMAN LOGIN -->
+<div id="login-page" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
       <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm2 4h14v2H5zm-2 4h18v2H3zm2 4h14v2H5z"/></svg>
     </div>
-    <div>
-      <div class="app-name">Timbangan Digital</div>
-      <div class="app-sub">ESP32 · Real-time Dashboard</div>
-    </div>
-  </div>
-  <div class="status-pill offline" id="status-pill">
-    <div class="dot"></div>
-    <span id="status-text">Offline</span>
+    <div class="login-title">Timbangan Digital</div>
+    <div class="login-sub">Masuk untuk mengakses dashboard</div>
+    <label class="login-label">Username</label>
+    <input class="login-input" type="text" id="inp-user" placeholder="Username" />
+    <label class="login-label">Password</label>
+    <input class="login-input" type="password" id="inp-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="login-btn" onclick="doLogin()">Masuk</button>
+    <div class="login-err" id="login-err">Username atau password salah!</div>
   </div>
 </div>
 
-<div class="main">
-  <div class="metrics">
-    <div class="metric-card green">
-      <div class="metric-label">Berat sekarang</div>
-      <div class="metric-value" id="berat-now">0.00<span>kg</span></div>
-      <div id="lock-badge" class="metric-badge badge-gray">Menunggu beban</div>
+<!-- HALAMAN DASHBOARD -->
+<div id="dashboard-page" style="display:none;">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm2 4h14v2H5zm-2 4h18v2H3zm2 4h14v2H5z"/></svg>
+      </div>
+      <div>
+        <div class="app-name">Timbangan Digital</div>
+        <div class="app-sub">ESP32 · Real-time Dashboard</div>
+      </div>
     </div>
-    <div class="metric-card accent">
-      <div class="metric-label">Total berat</div>
-      <div class="metric-value" id="total-berat">0.00<span>kg</span></div>
-      <div id="transaksi-badge" class="metric-badge badge-gray">0 transaksi</div>
-    </div>
-    <div class="metric-card amber">
-      <div class="metric-label">Harga / kg</div>
-      <div class="metric-value" id="harga-kg">—<span>Rp</span></div>
-      <div id="harga-badge" class="metric-badge badge-gray">Belum disimpan</div>
-    </div>
-    <div class="metric-card blue">
-      <div class="metric-label">Total bayar</div>
-      <div class="metric-value" id="total-bayar" style="font-size:22px">Rp 0</div>
-      <div id="bayar-detail" class="metric-badge badge-gray">—</div>
+    <div class="topbar-right">
+      <div class="status-pill offline" id="status-pill">
+        <div class="dot"></div>
+        <span id="status-text">Offline</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Keluar</button>
     </div>
   </div>
 
-  <div class="bottom-grid">
-    <div class="section-card">
-      <div class="section-head">
-        <div class="section-title">Riwayat penimbangan</div>
-        <button class="btn-clear" onclick="hapusRiwayat()">Hapus semua</button>
+  <div class="main">
+
+    <!-- METRIC CARDS -->
+    <div class="metrics">
+      <div class="metric-card green">
+        <div class="metric-label">Berat sekarang</div>
+        <div class="metric-value" id="berat-now">0.00<span>kg</span></div>
+        <div id="lock-badge" class="metric-badge badge-gray">Menunggu beban</div>
       </div>
-      <div class="search-bar">
-        <label>Cari tanggal:</label>
-        <input type="date" id="filter-tanggal" onchange="filterRiwayat()" />
-        <button class="btn-reset" onclick="resetFilter()">Reset</button>
-        <span class="result-badge" id="result-badge" style="display:none"></span>
+      <div class="metric-card accent">
+        <div class="metric-label">Total berat</div>
+        <div class="metric-value" id="total-berat">0.00<span>kg</span></div>
+        <div id="transaksi-badge" class="metric-badge badge-gray">0 transaksi</div>
       </div>
-      <div id="riwayat-container">
-        <div class="empty-state">Belum ada data transaksi</div>
+      <div class="metric-card amber">
+        <div class="metric-label">Harga / kg</div>
+        <div class="metric-value" id="harga-kg">—<span>Rp</span></div>
+        <div id="harga-badge" class="metric-badge badge-gray">Belum disimpan</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">Total bayar</div>
+        <div class="metric-value" id="total-bayar" style="font-size:22px">Rp 0</div>
+        <div id="bayar-detail" class="metric-badge badge-gray">—</div>
       </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:12px;">
+    <!-- WHATSAPP BANNER -->
+    <div class="wa-banner" id="wa-banner">
+      <div class="wa-banner-text">
+        <strong>Total bayar sudah dihitung!</strong>
+        Kirim hasil penimbangan ke WhatsApp pelanggan
+      </div>
+      <button class="btn-wa" onclick="bukaModalWA()">Kirim ke WhatsApp</button>
+    </div>
+
+    <!-- BOTTOM GRID -->
+    <div class="bottom-grid">
       <div class="section-card">
-        <div class="section-head"><div class="section-title">Status perangkat</div></div>
-        <div style="padding:16px 18px;">
-          <div class="status-list">
-            <div class="status-row"><div class="status-key">WiFi RSSI</div><span class="status-val" id="s-rssi">—</span></div>
-            <div class="status-row">
-              <div class="status-key">Baterai</div>
-              <div style="text-align:right">
-                <span class="status-val" id="s-bat-v">—</span>
-                <div class="bat-track"><div class="bat-fill" id="bat-fill" style="width:0%"></div></div>
+        <div class="section-head">
+          <div class="section-title">Riwayat penimbangan</div>
+          <button class="btn-clear" onclick="hapusRiwayat()">Hapus semua</button>
+        </div>
+        <div class="search-bar">
+          <label>Cari tanggal:</label>
+          <input type="date" id="filter-tanggal" onchange="filterRiwayat()" />
+          <button class="btn-reset" onclick="resetFilter()">Reset</button>
+          <span class="result-badge" id="result-badge" style="display:none"></span>
+        </div>
+        <div id="riwayat-container">
+          <div class="empty-state">Belum ada data transaksi</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="section-card">
+          <div class="section-head"><div class="section-title">Status perangkat</div></div>
+          <div style="padding:16px 18px;">
+            <div class="status-list">
+              <div class="status-row"><div class="status-key">WiFi RSSI</div><span class="status-val" id="s-rssi">—</span></div>
+              <div class="status-row">
+                <div class="status-key">Baterai</div>
+                <div style="text-align:right">
+                  <span class="status-val" id="s-bat-v">—</span>
+                  <div class="bat-track"><div class="bat-fill" id="bat-fill" style="width:0%"></div></div>
+                </div>
               </div>
+              <div class="status-row"><div class="status-key">Lock berat</div><span class="status-val" id="s-lock">—</span></div>
+              <div class="status-row"><div class="status-key">Harga status</div><span class="status-val" id="s-harga-sv">—</span></div>
+              <div class="status-row"><div class="status-key">Terakhir update</div><span class="status-val val-muted" id="s-time">—</span></div>
             </div>
-            <div class="status-row"><div class="status-key">Lock berat</div><span class="status-val" id="s-lock">—</span></div>
-            <div class="status-row"><div class="status-key">Harga status</div><span class="status-val" id="s-harga-sv">—</span></div>
-            <div class="status-row"><div class="status-key">Terakhir update</div><span class="status-val val-muted" id="s-time">—</span></div>
+            <div class="last-update" id="last-update-text">Menunggu data dari perangkat...</div>
           </div>
-          <div class="last-update" id="last-update-text">Menunggu data dari perangkat...</div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- MODAL WHATSAPP -->
+<div class="modal-overlay" id="modal-wa">
+  <div class="modal-box">
+    <div class="modal-title">Kirim ke WhatsApp</div>
+    <div class="modal-sub">Preview pesan yang akan dikirim</div>
+    <div class="modal-preview" id="wa-preview"></div>
+    <label class="modal-label">Nomor HP tujuan (contoh: 08123456789)</label>
+    <input class="modal-input" type="tel" id="inp-nomor" placeholder="08xxxxxxxxxx" />
+    <div class="modal-actions">
+      <button class="btn-batal" onclick="tutupModalWA()">Batal</button>
+      <button class="btn-kirim" onclick="kirimWA()">Kirim WhatsApp</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  const KREDENSIAL = { user: 'admin', pass: 't.digital' };
   let allRiwayat = [];
+  let dataAktif = {};
+  let totalBayarTerakhir = 0;
+  let waBannerSudahMuncul = false;
+
+  function doLogin() {
+    const u = document.getElementById('inp-user').value.trim();
+    const p = document.getElementById('inp-pass').value;
+    if (u === KREDENSIAL.user && p === KREDENSIAL.pass) {
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('dashboard-page').style.display = 'block';
+      sessionStorage.setItem('loggedin', '1');
+      fetchData();
+      setInterval(fetchData, 2000);
+    } else {
+      document.getElementById('login-err').style.display = 'block';
+    }
+  }
+
+  function doLogout() {
+    sessionStorage.removeItem('loggedin');
+    document.getElementById('dashboard-page').style.display = 'none';
+    document.getElementById('login-page').style.display = 'flex';
+    document.getElementById('inp-user').value = '';
+    document.getElementById('inp-pass').value = '';
+  }
+
+  if (sessionStorage.getItem('loggedin') === '1') {
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('dashboard-page').style.display = 'block';
+    fetchData();
+    setInterval(fetchData, 2000);
+  }
 
   function rupiah(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
   function kg(n) { return parseFloat(n).toFixed(2); }
@@ -195,23 +324,20 @@
     }
     const groups = groupByTanggal(data);
     const tanggalList = Object.keys(groups).sort((a, b) => {
-      const parse = t => {
-        const p = t.split('/');
-        return p.length === 3 ? new Date(p[2], p[1]-1, p[0]).getTime() : 0;
-      };
+      const parse = t => { const p = t.split('/'); return p.length===3 ? new Date(p[2],p[1]-1,p[0]).getTime() : 0; };
       return parse(b) - parse(a);
     });
     container.innerHTML = tanggalList.map(tgl => {
       const items = groups[tgl];
-      const totalBerat = items.reduce((s, i) => s + parseFloat(i.berat || 0), 0);
-      const totalBayar = items.reduce((s, i) => s + parseFloat(i.subtotal || 0), 0);
+      const totalBerat = items.reduce((s,i) => s + parseFloat(i.berat||0), 0);
+      const totalBayar = items.reduce((s,i) => s + parseFloat(i.subtotal||0), 0);
       const rows = items.slice().reverse().map(item => `
         <tr>
           <td class="td-muted">#${item.id}</td>
           <td class="mono">${parseFloat(item.berat).toFixed(2)} kg</td>
           <td class="mono td-muted">Rp ${Math.round(item.harga).toLocaleString('id-ID')}</td>
           <td class="mono td-green">Rp ${Math.round(item.subtotal).toLocaleString('id-ID')}</td>
-          <td class="td-muted" style="font-size:12px">${item.waktu || '—'}</td>
+          <td class="td-muted" style="font-size:12px">${item.waktu||'—'}</td>
         </tr>`).join('');
       return `
         <div class="tanggal-group">
@@ -234,7 +360,7 @@
   function filterRiwayat() {
     const input = document.getElementById('filter-tanggal').value;
     const badge = document.getElementById('result-badge');
-    if (!input) { renderRiwayat(allRiwayat); badge.style.display = 'none'; return; }
+    if (!input) { renderRiwayat(allRiwayat); badge.style.display='none'; return; }
     const d = new Date(input);
     const tglCari = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
     const filtered = allRiwayat.filter(item => item.tanggal === tglCari);
@@ -249,17 +375,52 @@
     renderRiwayat(allRiwayat);
   }
 
+  function buatPesanWA() {
+    const tgl = new Date().toLocaleDateString('id-ID', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const tb = parseFloat(dataAktif.total_berat||0).toFixed(2);
+    const hp = Math.round(dataAktif.harga_per_kg||0).toLocaleString('id-ID');
+    const bayar = Math.round(dataAktif.total_bayar||0).toLocaleString('id-ID');
+    return `HASIL PENIMBANGAN SAWIT\n${tgl}\n\nTotal berat    : ${tb} kg\nHarga per kg   : Rp ${hp}\nTotal bayar    : Rp ${bayar}\n\n        TERIMAKASIH`;
+  }
+
+  function bukaModalWA() {
+    document.getElementById('wa-preview').textContent = buatPesanWA();
+    document.getElementById('inp-nomor').value = '';
+    document.getElementById('modal-wa').classList.add('show');
+  }
+
+  function tutupModalWA() {
+    document.getElementById('modal-wa').classList.remove('show');
+  }
+
+  function kirimWA() {
+    let nomor = document.getElementById('inp-nomor').value.trim().replace(/\D/g,'');
+    if (!nomor) { alert('Masukkan nomor HP dulu!'); return; }
+    if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
+    const pesan = encodeURIComponent(buatPesanWA());
+    window.open(`https://wa.me/${nomor}?text=${pesan}`, '_blank');
+    tutupModalWA();
+  }
+
   async function fetchData() {
     try {
       const [dataRes, riwayatRes] = await Promise.all([fetch('/api/data'), fetch('/api/riwayat')]);
       const d = await dataRes.json();
       const r = await riwayatRes.json();
       allRiwayat = r;
+      dataAktif = d;
       updateUI(d);
       const filterAktif = document.getElementById('filter-tanggal').value;
       if (filterAktif) { filterRiwayat(); } else { renderRiwayat(allRiwayat); }
       document.getElementById('transaksi-badge').textContent = r.length + ' transaksi';
       document.getElementById('transaksi-badge').className = r.length > 0 ? 'metric-badge badge-green' : 'metric-badge badge-gray';
+
+      // Tampilkan banner WA kalau total bayar > 0 dan baru berubah
+      const bayarBaru = d.total_bayar || 0;
+      if (bayarBaru > 0 && bayarBaru !== totalBayarTerakhir) {
+        totalBayarTerakhir = bayarBaru;
+        document.getElementById('wa-banner').classList.add('show');
+      }
     } catch(e) { setOffline(); }
   }
 
@@ -267,38 +428,38 @@
     document.getElementById('status-pill').className = 'status-pill ' + (d.online ? 'online' : 'offline');
     document.getElementById('status-text').textContent = d.online ? 'Online' : 'Offline';
     const beratVal = d.lock_aktif ? d.berat_terkunci : d.berat_sekarang;
-    document.getElementById('berat-now').innerHTML = kg(beratVal || 0) + '<span>kg</span>';
+    document.getElementById('berat-now').innerHTML = kg(beratVal||0) + '<span>kg</span>';
     const lockBadge = document.getElementById('lock-badge');
-    if (d.lock_aktif) { lockBadge.textContent = '🔒 Berat terkunci'; lockBadge.className = 'metric-badge badge-green'; }
-    else if ((beratVal||0) > 0.05) { lockBadge.textContent = 'Mendeteksi beban...'; lockBadge.className = 'metric-badge badge-amber'; }
-    else { lockBadge.textContent = 'Menunggu beban'; lockBadge.className = 'metric-badge badge-gray'; }
+    if (d.lock_aktif) { lockBadge.textContent='🔒 Berat terkunci'; lockBadge.className='metric-badge badge-green'; }
+    else if ((beratVal||0)>0.05) { lockBadge.textContent='Mendeteksi beban...'; lockBadge.className='metric-badge badge-amber'; }
+    else { lockBadge.textContent='Menunggu beban'; lockBadge.className='metric-badge badge-gray'; }
     document.getElementById('total-berat').innerHTML = kg(d.total_berat||0) + '<span>kg</span>';
-    const hp = d.harga_per_kg || 0;
-    document.getElementById('harga-kg').innerHTML = hp > 0 ? hp.toLocaleString('id-ID') + '<span>Rp</span>' : '—<span>Rp</span>';
+    const hp = d.harga_per_kg||0;
+    document.getElementById('harga-kg').innerHTML = hp>0 ? hp.toLocaleString('id-ID')+'<span>Rp</span>' : '—<span>Rp</span>';
     document.getElementById('harga-badge').textContent = d.harga_disimpan ? 'Tersimpan ✓' : 'Belum disimpan';
     document.getElementById('harga-badge').className = d.harga_disimpan ? 'metric-badge badge-green' : 'metric-badge badge-gray';
     document.getElementById('total-bayar').textContent = rupiah(d.total_bayar||0);
-    const tb = d.total_berat || 0;
-    if (tb > 0 && hp > 0) { document.getElementById('bayar-detail').textContent = kg(tb) + ' kg × Rp ' + hp.toLocaleString('id-ID'); document.getElementById('bayar-detail').className = 'metric-badge badge-green'; }
-    else { document.getElementById('bayar-detail').textContent = '—'; document.getElementById('bayar-detail').className = 'metric-badge badge-gray'; }
-    const rssi = d.wifi_rssi || 0;
+    const tb = d.total_berat||0;
+    if (tb>0 && hp>0) { document.getElementById('bayar-detail').textContent=kg(tb)+' kg × Rp '+hp.toLocaleString('id-ID'); document.getElementById('bayar-detail').className='metric-badge badge-green'; }
+    else { document.getElementById('bayar-detail').textContent='—'; document.getElementById('bayar-detail').className='metric-badge badge-gray'; }
+    const rssi = d.wifi_rssi||0;
     const rssiEl = document.getElementById('s-rssi');
-    rssiEl.textContent = rssi + ' dBm';
-    rssiEl.className = 'status-val ' + (rssi > -60 ? 'val-green' : rssi > -75 ? 'val-amber' : 'val-red');
-    const volt = d.baterai_volt || 0;
-    document.getElementById('s-bat-v').textContent = volt.toFixed(2) + ' V';
-    const pct = Math.max(0, Math.min(100, Math.round((volt-10.5)/(13.2-10.5)*100)));
+    rssiEl.textContent = rssi+' dBm';
+    rssiEl.className = 'status-val '+(rssi>-60?'val-green':rssi>-75?'val-amber':'val-red');
+    const volt = d.baterai_volt||0;
+    document.getElementById('s-bat-v').textContent = volt.toFixed(2)+' V';
+    const pct = Math.max(0,Math.min(100,Math.round((volt-10.5)/(13.2-10.5)*100)));
     const batFill = document.getElementById('bat-fill');
-    batFill.style.width = pct + '%';
-    batFill.style.background = pct > 60 ? '#22c55e' : pct > 30 ? '#f59e0b' : '#ef4444';
-    document.getElementById('s-lock').textContent = d.lock_aktif ? 'Aktif' : 'Tidak aktif';
-    document.getElementById('s-lock').className = 'status-val ' + (d.lock_aktif ? 'val-green' : 'val-muted');
-    document.getElementById('s-harga-sv').textContent = d.harga_disimpan ? 'Tersimpan (SV)' : 'Belum disimpan';
-    document.getElementById('s-harga-sv').className = 'status-val ' + (d.harga_disimpan ? 'val-green' : 'val-muted');
+    batFill.style.width = pct+'%';
+    batFill.style.background = pct>60?'#22c55e':pct>30?'#f59e0b':'#ef4444';
+    document.getElementById('s-lock').textContent = d.lock_aktif?'Aktif':'Tidak aktif';
+    document.getElementById('s-lock').className = 'status-val '+(d.lock_aktif?'val-green':'val-muted');
+    document.getElementById('s-harga-sv').textContent = d.harga_disimpan?'Tersimpan (SV)':'Belum disimpan';
+    document.getElementById('s-harga-sv').className = 'status-val '+(d.harga_disimpan?'val-green':'val-muted');
     if (d.timestamp) {
       const t = new Date(d.timestamp);
       document.getElementById('s-time').textContent = t.toLocaleTimeString('id-ID');
-      document.getElementById('last-update-text').textContent = 'Update terakhir: ' + t.toLocaleString('id-ID');
+      document.getElementById('last-update-text').textContent = 'Update terakhir: '+t.toLocaleString('id-ID');
     }
   }
 
@@ -310,12 +471,11 @@
 
   async function hapusRiwayat() {
     if (!confirm('Hapus semua riwayat transaksi?')) return;
-    await fetch('/api/riwayat', { method: 'DELETE' });
+    await fetch('/api/riwayat', {method:'DELETE'});
     allRiwayat = []; renderRiwayat([]); resetFilter();
+    document.getElementById('wa-banner').classList.remove('show');
+    totalBayarTerakhir = 0;
   }
-
-  fetchData();
-  setInterval(fetchData, 2000);
 </script>
 </body>
 </html>
